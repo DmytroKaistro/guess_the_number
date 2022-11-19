@@ -1,49 +1,61 @@
-'use strict';
+let life = 10;
+let bestResult = 0;
+let secretNumber = Math.floor(Math.random() * 20) + 1;
 
-let sectrtNum = Math.trunc(Math.random() * 20 + 1);
-let score = 20;
-let highscore = 0;
+const changeUserText = function (text) {
+  document.querySelector('.start-message').textContent = text;
+};
 
-const displayGuessMessage = function(message) {
-  document.querySelector('.guess-message').textContent = message;
-}
+const changeUserLife = function () {
+  life--;
+  document.querySelector('.score-life').textContent = life;
+};
 
-const eventHandler = function () {
-  const guessingNumber = Number(document.querySelector('.number-input').value);
-  if (!guessingNumber) {
-    displayGuessMessage('enter num');
-  } else if (guessingNumber === sectrtNum) {
-    displayGuessMessage('Yeap');
-    document.querySelector('.question').textContent = sectrtNum;
-    document.querySelector('body').style.background = 'green';
-    document.querySelector('.question').style.width = '50rem';
-    if (score > highscore) {
-      document.querySelector('.highscore').textContent = score;
+const gameStart = function () {
+  const userInput = Number(document.querySelector('.user-input').value);
+  if (!userInput) {
+    changeUserText('Введіть число!');
+  } else if (userInput !== secretNumber) {
+    changeUserText(
+      userInput < secretNumber ? 'Ваше число замале' : 'Ваше число велике'
+    );
+    let backColor = Math.trunc((((userInput * 100) / 20) * 255) / 100);
+    document.querySelector(
+      'body'
+    ).style.background = `rgb(${backColor}, ${backColor}, ${backColor})`;
+    if (life > 1) {
+      changeUserLife();
+    } else {
+      changeUserLife();
+      document.querySelector('.btn-check').disabled = true;
+      document.querySelector('.btn-check').style.background = 'red';
+      changeUserText('Ви програли :(');
     }
+  } else if (userInput === secretNumber) {
+    changeUserText('Ви вгадали :)');
+    document.querySelector('.btn-check').disabled = true;
+    document.querySelector('.btn-check').style.background = 'green';
+    document.querySelector(
+      '.secretNumber'
+    ).textContent = `Загадане число ${secretNumber}`;
+    if (bestResult < life) {
+      bestResult = life;
+      document.querySelector('.best-score').textContent = bestResult;
+    }
+    document.querySelector('.user-input').value = '';
   }
-    else if (guessingNumber !== sectrtNum) {
-      if (score > 1) {
-        displayGuessMessage(guessingNumber > sectrtNum ? 'More than num' : 'Low than num');
-        score--;
-        document.querySelector('.score').textContent = score;
-      } else {
-        displayGuessMessage('game over');
-        document.querySelector('.score').textContent = 0;
-      }
-    }
-};
-const eventRandom = function () {
-  document.querySelector('.question').textContent = '???';
-  displayGuessMessage('Начни угадывать');
-  document.querySelector('body').style.background = '#000000';
-  document.querySelector('.question').style.width = '25rem';
-  score = 20;
-  document.querySelector('.score').textContent = score;
-  sectrtNum = Math.trunc(Math.random() * 20 + 1);
-  document.querySelector('.number-input').value = '';
 };
 
+const gameReStart = function () {
+  document.querySelector('body').style.background = 'rgb(0, 0, 0)';
+  changeUserText('Почни вгадувати!');
+  life = 10;
+  document.querySelector('.score-life').textContent = life;
+  document.querySelector('.btn-check').disabled = false;
+  document.querySelector('.btn-check').style.background = 'rgb(173, 216,246)';
+  document.querySelector('.secretNumber').textContent = 'Вгадай число!';
+  secretNumber = Math.floor(Math.random() * 20) + 1;
+};
 
-
-document.querySelector('.check').addEventListener('click', eventHandler);
-document.querySelector('.again').addEventListener('click', eventRandom);
+document.querySelector('.btn-check').addEventListener('click', gameStart);
+document.querySelector('.btn-again').addEventListener('click', gameReStart);
